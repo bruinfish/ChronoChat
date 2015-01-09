@@ -48,6 +48,7 @@ Controller::Controller(QWidget* parent)
   , m_startChatDialog(new StartChatDialog)
   , m_profileEditor(new ProfileEditor)
   , m_invitationDialog(new InvitationDialog)
+  , m_invitationRequestDialog(new InvitationRequestDialog)
   , m_contactPanel(new ContactPanel)
   , m_browseContactDialog(new BrowseContactDialog)
   , m_addContactPanel(new AddContactPanel)
@@ -96,6 +97,10 @@ Controller::Controller(QWidget* parent)
   // Connection to InvitationDialog
   connect(m_invitationDialog, SIGNAL(invitationResponded(const ndn::Name&, bool)),
           &m_backend, SLOT(onInvitationResponded(const ndn::Name&, bool)));
+
+  // Connection to InvitationRequestDialog
+  connect(m_invitationRequestDialog, SIGNAL(invitationRequestResponded(const ndn::Name&, bool)),
+          &m_backend, SLOT(onInvitationRequestResponded(const ndn::Name&, bool)));
 
   // Connection to AddContactPanel
   connect(m_addContactPanel, SIGNAL(fetchInfo(const QString&)),
@@ -169,8 +174,15 @@ Controller::Controller(QWidget* parent)
           m_settingDialog, SLOT(onLocalPrefixUpdated(const QString&)));
 
   // on invitation validated:
-  connect(&m_backend, SIGNAL(invitaionValidated(QString, QString, ndn::Name)),
+  connect(&m_backend, SIGNAL(invitationValidated(QString, QString, ndn::Name)),
           m_invitationDialog, SLOT(onInvitationReceived(QString, QString, ndn::Name)));
+  connect(&m_backend, SIGNAL(startChatroom(const QString&, bool)),
+          this, SLOT(onStartChatroom(const QString&, bool)));
+
+  // on invitation request received
+  connect(&m_backend, SIGNAL(invitationRequestReceived(QString, QString, ndn::Name)),
+          m_invitationRequestDialog, SLOT(onInvitationRequestReceived(QString, QString,
+                                                                      ndn::Name)));
 
   // on invitation accepted:
   connect(&m_backend, SIGNAL(startChatroomOnInvitation(chronos::Invitation, bool)),
@@ -209,10 +221,14 @@ Controller::Controller(QWidget* parent)
           m_discoveryPanel, SLOT(onIdentityUpdated(const QString&)));
   connect(m_chatroomDiscoveryBackend, SIGNAL(chatroomListReady(const QStringList&)),
           m_discoveryPanel, SLOT(onChatroomListReady(const QStringList&)));
-  connect(m_chatroomDiscoveryBackend, SIGNAL(chatroomInfoReady(const ChatroomInfo&)),
-          m_discoveryPanel, SLOT(onChatroomInfoReady(const ChatroomInfo&)));
+  connect(m_chatroomDiscoveryBackend, SIGNAL(chatroomInfoReady(const ChatroomInfo&, bool)),
+          m_discoveryPanel, SLOT(onChatroomInfoReady(const ChatroomInfo&, bool)));
   connect(m_discoveryPanel, SIGNAL(startChatroom(const QString&, bool)),
           this, SLOT(onStartChatroom(const QString&, bool)));
+  connect(m_discoveryPanel, SIGNAL(sendInvitationRequest(const QString&, const QString&)),
+          &m_backend, SLOT(onSendInvitationRequest(const QString&, const QString&)));
+  connect(&m_backend, SIGNAL(invitationRequestResult(const std::string&)),
+          m_discoveryPanel, SLOT(onInvitationRequestResult(const std::string&)));
 
   m_chatroomDiscoveryBackend->start();
 

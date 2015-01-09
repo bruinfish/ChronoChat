@@ -432,7 +432,7 @@ ChatroomDiscoveryBackend::onWaitForChatroomInfo(const QString& chatroomName)
 {
   auto chatroom = m_chatroomList.find(Name::Component(chatroomName.toStdString()));
   if (chatroom != m_chatroomList.end())
-    emit chatroomInfoReady(chatroom->second.info);
+    emit chatroomInfoReady(chatroom->second.info, chatroom->second.isParticipant);
 }
 
 void

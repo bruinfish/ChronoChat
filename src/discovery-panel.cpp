@@ -13,6 +13,7 @@
 
 #include <QItemSelectionModel>
 #include <QModelIndex>
+#include <QMessageBox>
 
 #ifndef Q_MOC_RUN
 #endif
@@ -43,6 +44,12 @@ DiscoveryPanel::DiscoveryPanel(QWidget *parent)
           SLOT(onSelectedParticipantChanged(const QItemSelection &, const QItemSelection &)));
   connect(ui->join, SIGNAL(clicked()),
           this, SLOT(onJoinClicked()));
+  connect(ui->requestInvitation, SIGNAL(clicked()),
+          this, SLOT(onRequestInvitation()));
+
+  ui->join->setEnabled(false);
+  ui->requestInvitation->setEnabled(false);
+  ui->InChatroomWarning->clear();
 }
 
 DiscoveryPanel::~DiscoveryPanel()
@@ -73,6 +80,9 @@ DiscoveryPanel::resetPanel()
   m_chatroom.clear();
   m_chatroomListModel->setStringList(m_chatroomList);
 
+  ui->join->setEnabled(false);
+  ui->requestInvitation->setEnabled(false);
+  ui->InChatroomWarning->clear();
 }
 
 // public slots
@@ -90,7 +100,7 @@ DiscoveryPanel::onChatroomListReady(const QStringList& list)
 }
 
 void
-DiscoveryPanel::onChatroomInfoReady(const ChatroomInfo& info)
+DiscoveryPanel::onChatroomInfoReady(const ChatroomInfo& info, bool isParticipant)
 {
   ui->NameData->setText(QString::fromStdString(info.getName().toUri()));
   ui->NameSpaceData->setText(QString::fromStdString(info.getSyncPrefix().toUri()));
@@ -123,6 +133,12 @@ DiscoveryPanel::onChatroomInfoReady(const ChatroomInfo& info)
       ui->join->setEnabled(false);
       ui->requestInvitation->setEnabled(false);
     }
+  }
+  ui->InChatroomWarning->clear();
+  if (isParticipant) {
+    ui->join->setEnabled(false);
+    ui->requestInvitation->setEnabled(false);
+    ui->InChatroomWarning->setText(QString("You are already in this chatroom"));
   }
 
   std::list<Name>roster = info.getParticipants();
@@ -194,6 +210,19 @@ void
 DiscoveryPanel::onJoinClicked()
 {
   emit startChatroom(m_chatroom, false);
+}
+
+void
+DiscoveryPanel::onRequestInvitation()
+{
+  emit sendInvitationRequest(m_chatroom, m_participant);
+}
+
+void
+DiscoveryPanel::onInvitationRequestResult(const std::string& message)
+{
+  QMessageBox::information(this, tr("Chatroom Discovery"),
+                           tr(message.c_str()));
 }
 
 } // namespace chronos
