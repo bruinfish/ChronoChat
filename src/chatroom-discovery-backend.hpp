@@ -124,6 +124,9 @@ signals:
   void
   chatroomInfoReady(const ChatroomInfo& info, bool isParticipant);
 
+  void
+  error(const QString& msg);
+
 public slots:
 
   /**

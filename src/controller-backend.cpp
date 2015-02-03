@@ -52,11 +52,16 @@ ControllerBackend::~ControllerBackend()
 void
 ControllerBackend::run()
 {
-  setInvitationListener();
+  try {
+    setInvitationListener();
 
-  m_face.processEvents();
+    m_face.processEvents();
 
-  std::cerr << "Bye!" << std::endl;
+    std::cerr << "Bye!" << std::endl;
+  }
+  catch (std::runtime_error& e) {
+    emit error(QString(e.what()));
+  }
 }
 
 // private methods:

@@ -155,6 +155,8 @@ Controller::Controller(QWidget* parent)
                                                   const QString&, bool)));
 
   // Connection to backend thread
+  connect(&m_backend, SIGNAL(error(const QString&)),
+          this, SLOT(onError(const QString&)));
   connect(this, SIGNAL(shutdownBackend()),
           &m_backend, SLOT(shutdown()));
   connect(this, SIGNAL(updateLocalPrefix()),
@@ -211,6 +213,8 @@ Controller::Controller(QWidget* parent)
           m_chatroomDiscoveryBackend, SLOT(shutdown()));
   connect(this, SIGNAL(identityUpdated(const QString&)),
           m_chatroomDiscoveryBackend, SLOT(onIdentityUpdated(const QString&)));
+  connect(m_chatroomDiscoveryBackend, SIGNAL(error(const QString&)),
+          this, SLOT(onError(const QString&)));
 
   // connect chatroom discovery back end with front end
   connect(m_discoveryPanel, SIGNAL(waitForChatroomInfo(const QString&)),
@@ -489,6 +493,8 @@ Controller::addChatDialog(const QString& chatroomName, ChatDialog* chatDialog)
           chatDialog->getBackend(), SLOT(updateRoutingPrefix(const QString&)));
 
   // connect chat dialog with discovery backend
+  connect(chatDialog->getBackend(), SIGNAL(error(const QString&)),
+          this, SLOT(onError(const QString&)));
   connect(chatDialog->getBackend(), SIGNAL(addInRoster(ndn::Name, ndn::Name::Component)),
           m_chatroomDiscoveryBackend, SLOT(onAddInRoster(ndn::Name, ndn::Name::Component)));
   connect(chatDialog->getBackend(), SIGNAL(eraseInRoster(ndn::Name, ndn::Name::Component)),

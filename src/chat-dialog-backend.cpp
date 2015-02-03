@@ -56,22 +56,27 @@ void
 ChatDialogBackend::run()
 {
   bool shouldResume = false;
-  do {
-    initializeSync();
+  try {
+    do {
+      initializeSync();
 
-    if (m_face == nullptr)
-      break;
+      if (m_face == nullptr)
+        break;
 
-    m_face->getIoService().run();
+      m_face->getIoService().run();
 
-    m_mutex.lock();
-    shouldResume = m_shouldResume;
-    m_shouldResume = false;
-    m_mutex.unlock();
+      m_mutex.lock();
+      shouldResume = m_shouldResume;
+      m_shouldResume = false;
+      m_mutex.unlock();
 
-  } while (shouldResume);
+    } while (shouldResume);
 
-  std::cerr << "Bye!" << std::endl;
+    std::cerr << "Bye!" << std::endl;
+  }
+  catch (std::runtime_error& e) {
+    emit error(QString(e.what()));
+  }
 }
 
 // private methods:

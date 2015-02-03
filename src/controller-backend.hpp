@@ -113,6 +113,9 @@ signals:
   void
   invitationRequestResult(const std::string& msg);
 
+  void
+  error(const QString& msg);
+
 public slots:
   void
   shutdown();

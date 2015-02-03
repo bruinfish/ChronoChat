@@ -131,6 +131,9 @@ signals:
   void
   addInRoster(ndn::Name sessionPrefix, ndn::Name::Component chatroomName);
 
+  void
+  error(const QString& msg);
+
 public slots:
   void
   sendChatMessage(QString text, time_t timestamp);
