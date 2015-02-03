@@ -170,11 +170,11 @@ class AppBundle(object):
             try:
               os.remove(dst + '/Headers')
               os.remove(dst + '/' + name + '.prl')
-              os.remove(dst + '/' + name + '_debug')
-              os.remove(dst + '/' + name + '_debug.prl')
+              # os.remove(dst + '/' + name + '_debug')
+              # os.remove(dst + '/' + name + '_debug.prl')
               shutil.rmtree(dst + '/Versions/4/Headers')
-              os.remove(dst + '/Versions/4/' + name + '_debug')
-            except OSError:
+              # os.remove(dst + '/Versions/4/' + name + '_debug')
+            except OSError as e:
               pass
             os.chmod(abs, 0755)
             os.system('install_name_tool -id @executable_path/../Frameworks/%s %s' % (rel, abs))
@@ -232,7 +232,7 @@ class AppBundle(object):
     for rsrc in rsrcs:
       b = os.path.basename(rsrc)
       if os.path.isdir(rsrc):
-                          shutil.copytree(rsrc, os.path.join(rsrcpath, b), symlinks=True)
+        shutil.copytree(rsrc, os.path.join(rsrcpath, b), symlinks=True)
       elif os.path.isfile(rsrc):
         shutil.copy(rsrc, os.path.join(rsrcpath, b))
 
