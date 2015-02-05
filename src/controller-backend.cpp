@@ -337,7 +337,7 @@ void
 ControllerBackend::onUpdateLocalPrefixAction()
 {
   // Name interestName();
-  Interest interest("/localhop/ndn-autoconf/routable-prefixes");
+  Interest interest("/localhop/nfd/ndn-autoconf/routable-prefixes");
   interest.setInterestLifetime(time::milliseconds(1000));
   interest.setMustBeFresh(true);
 
