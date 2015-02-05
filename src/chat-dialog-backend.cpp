@@ -101,6 +101,7 @@ ChatDialogBackend::initializeSync()
     validator->addTrustAnchor(anchor);
 
     m_validator = validator;
+    m_validator = shared_ptr<ndn::Validator>();
   }
   else
     m_validator = shared_ptr<ndn::Validator>();
